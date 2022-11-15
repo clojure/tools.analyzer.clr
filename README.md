@@ -1,6 +1,6 @@
 # tools.analyzer.clr
 
-A port of [clojure/tools.analyzer.jvm](https://github.com/clojure/tools.analyzer.jvm] to ClojureCLR.
+A port of [clojure/tools.analyzer.jvm](https://github.com/clojure/tools.analyzer.jvm) to ClojureCLR.
 
 THIS IS A WORK-IN-PROGRESS.  DO NOT USE. (YET.)
 
@@ -14,13 +14,17 @@ Please see the JVM version's [README](https://github.com/clojure/tools.analyzer.
 
 Nuget reference:
 
+```
     PM> Install-Package tools.analyzer.clr -Version 1.2.2 
+```
 	
 Leiningen/Clojars reference:
 
+```
    [org.clojure.clr/tools.analyzer.clr "1.1.1"]
+```
    
-## Notes on the ported code ##
+## Notes on the ported code
 
 Work in progress.
 
