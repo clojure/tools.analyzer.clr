@@ -6,7 +6,7 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(ns clojure.tools.analyzer.passes.jvm.fix-case-test
+(ns clojure.tools.analyzer.passes.clr.fix-case-test
   (:require [clojure.tools.analyzer.passes.add-binding-atom :refer [add-binding-atom]]))
 
 (defn fix-case-test

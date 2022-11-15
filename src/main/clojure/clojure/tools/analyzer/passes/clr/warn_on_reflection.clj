@@ -6,8 +6,8 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(ns clojure.tools.analyzer.passes.jvm.warn-on-reflection
-  (:require [clojure.tools.analyzer.passes.jvm
+(ns clojure.tools.analyzer.passes.clr.warn-on-reflection
+  (:require [clojure.tools.analyzer.passes.clr
              [validate-loop-locals :refer [validate-loop-locals]]
              [validate :refer [validate]]]))
 

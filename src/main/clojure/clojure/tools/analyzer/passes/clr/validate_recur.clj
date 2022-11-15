@@ -6,7 +6,7 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(ns clojure.tools.analyzer.passes.jvm.validate-recur
+(ns clojure.tools.analyzer.passes.clr.validate-recur
   (:require [clojure.tools.analyzer.ast :refer [update-children]]
             [clojure.tools.analyzer.utils :refer [-source-info]]))
 

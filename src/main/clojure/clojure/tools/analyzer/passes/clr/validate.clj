@@ -6,16 +6,16 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(ns clojure.tools.analyzer.passes.jvm.validate
+(ns clojure.tools.analyzer.passes.clr.validate
   (:require [clojure.tools.analyzer.ast :refer [prewalk]]
             [clojure.tools.analyzer.env :as env]
             [clojure.tools.analyzer.passes.cleanup :refer [cleanup]]
-            [clojure.tools.analyzer.passes.jvm
+            [clojure.tools.analyzer.passes.clr
              [validate-recur :refer [validate-recur]]
              [infer-tag :refer [infer-tag]]
              [analyze-host-expr :refer [analyze-host-expr]]]
             [clojure.tools.analyzer.utils :refer [arglist-for-arity source-info resolve-sym resolve-ns merge']]
-            [clojure.tools.analyzer.jvm.utils :as u :refer [tag-match? try-best-match]])
+            [clojure.tools.analyzer.clr.utils :as u :refer [tag-match? try-best-match]])
   (:import (clojure.lang IFn ExceptionInfo)))
 
 (defmulti -validate :op)

@@ -6,10 +6,10 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(ns clojure.tools.analyzer.passes.jvm.validate-loop-locals
+(ns clojure.tools.analyzer.passes.clr.validate-loop-locals
   (:require [clojure.tools.analyzer.ast :refer [postwalk children update-children]]
-            [clojure.tools.analyzer.jvm.utils :refer [wider-tag maybe-class primitive?]]
-            [clojure.tools.analyzer.passes.jvm
+            [clojure.tools.analyzer.clr.utils :refer [wider-tag maybe-class primitive?]]
+            [clojure.tools.analyzer.passes.clr
              [validate :refer [validate]]
              [classify-invoke :refer [classify-invoke]]
              [infer-tag :refer [infer-tag]]

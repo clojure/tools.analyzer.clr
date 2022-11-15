@@ -6,13 +6,13 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(ns clojure.tools.analyzer.jvm.utils
+(ns clojure.tools.analyzer.clr.utils
   (:require [clojure.tools.analyzer.utils :as u]
             [clojure.tools.analyzer.env :as env]
             [clojure.reflect :as reflect]
             [clojure.string :as s]
             [clojure.core.memoize :refer [lru]]
-            [clojure.java.io :as io])
+            [clojure.clr.io :as io])                ;;; [clojure.java.io :as io]
   (:import (clojure.lang RT Symbol Var)
            ))                                       ;;; org.objectweb.asm.Type
 

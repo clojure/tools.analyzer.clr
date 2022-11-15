@@ -6,7 +6,7 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(ns clojure.tools.analyzer.jvm
+(ns clojure.tools.analyzer.clr
   "Analyzer for clojure code, extends tools.analyzer with JVM specific passes/forms"
   (:refer-clojure :exclude [macroexpand-1 macroexpand])
   (:require [clojure.tools.analyzer
@@ -20,7 +20,7 @@
              [env :as env :refer [*env*]]
              [passes :refer [schedule]]]
 
-            [clojure.tools.analyzer.jvm.utils :refer :all :as u :exclude [box specials]]
+            [clojure.tools.analyzer.clr.utils :refer :all :as u :exclude [box specials]]
 
             [clojure.tools.analyzer.passes
              [source-info :refer [source-info]]
@@ -29,7 +29,7 @@
              [warn-earmuff :refer [warn-earmuff]]
              [uniquify :refer [uniquify-locals]]]
 
-            [clojure.tools.analyzer.passes.jvm
+            [clojure.tools.analyzer.passes.clr
              [analyze-host-expr :refer [analyze-host-expr]]
              [box :refer [box]]
              [constant-lifter :refer [constant-lift]]

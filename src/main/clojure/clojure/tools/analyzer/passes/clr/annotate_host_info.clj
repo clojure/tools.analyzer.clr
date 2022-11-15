@@ -6,14 +6,14 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(ns clojure.tools.analyzer.passes.jvm.annotate-host-info
+(ns clojure.tools.analyzer.passes.clr.annotate-host-info
   (:require [clojure.tools.analyzer :as ana]
             [clojure.tools.analyzer.ast :refer [prewalk]]
             [clojure.tools.analyzer.passes
              [cleanup :refer [cleanup]]
              [elide-meta :refer [elide-meta]]]
             [clojure.tools.analyzer.utils :refer [source-info]]
-            [clojure.tools.analyzer.jvm.utils
+            [clojure.tools.analyzer.clr.utils
              :refer [members name-matches? try-best-match]
              :as u]))
 
