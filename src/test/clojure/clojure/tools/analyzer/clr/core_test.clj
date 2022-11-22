@@ -103,7 +103,7 @@
   (is (ast1 (defrecord TestRecord [x y]))))
 
 (deftest eq-no-reflection
-  (is (:validated? (-> (ast1 (fn [s] (= s \f))) :methods first :body))))
+  (is (:validated? (-> (ast1 (fn [s] (= s \f))) :expr :methods first :body))))         ;;; I had to add the :expr to get this to work.
 
 (deftest analyze+eval-context-test
   (let [do-ast (ana.clr/analyze+eval '(do 1 2 3))]

@@ -66,6 +66,7 @@
                   :children [:instance :args]}))))
 
 (defn analyze-host-field
+  [target-type field target-expr class env]
   (if class
     (case target-type
       :static (or (maybe-static-field (list '. class field))
