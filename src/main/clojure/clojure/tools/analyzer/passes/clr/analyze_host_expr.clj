@@ -66,7 +66,6 @@
                   :children [:instance :args]}))))
 
 (defn analyze-host-field
-  [target-type field target-expr class env]
   (if class
     (case target-type
       :static (or (maybe-static-field (list '. class field))
@@ -154,8 +153,8 @@
                                          (maybe-class-literal (:form target)))]
                    (merge target
                           (assoc (ana/analyze-const the-class env :class)
-                            :tag   Class
-                            :o-tag Class))
+                            :tag   Type                                             ;;; Class
+                            :o-tag Type))                                           ;;; Class
                    target)
           class? (and (= :const (:op target))
                       (= :class (:type target))

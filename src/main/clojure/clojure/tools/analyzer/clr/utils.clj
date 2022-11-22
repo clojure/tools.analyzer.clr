@@ -77,16 +77,16 @@
   "Takes a Symbol, String or Class and tires to resolve to a matching Class"
   class)
 
-(def ^Type maybe-class                                                                ;;; ^Class
+(defn array-class [element-type]
   (RT/classForName
-   (str "[" (-> element-type
-              maybe-class
-              Type/getType                                                             ;;; ????
-              .getDescriptor                                                           ;;; ????
-              (.Replace \/ \.)))))                                                     ;;; .replace
-
+    (str (-> element-type                                     ;;; (str "[" (-> element-type
+             maybe-class                                      ;;;            maybe-class
+             .GetFullName                                     ;;;            Type/getType
+            (.Replace \/ \.))                                  ;;;            .getDescriptor
+          "[]")))                                             ;;;            (.replace \/ \.)))
+			  
 (defn maybe-class-from-string [^String s]
-  (or (when-let [maybe-class (and (neg? (.indexOf s "."))
+  (or (when-let [maybe-class (and (neg? (.IndexOf s "."))                             ;;; .indexOf
                                   (not= \[ (first s))
                                   (if env/*env*
                                     (u/resolve-sym (symbol s) {:ns (ns-name *ns*)})
@@ -287,8 +287,8 @@
                           (not-any? #{:public :protected} flags))
                         (-> class
                             maybe-class
-                            ^Class (box)
-                            .getName
+                            ^Type (box)                                   ;;; Class
+                            .FullName                                      ;;; .getName
                             symbol
                             (type-reflect :ancestors true)
                             :members)))))))
@@ -343,7 +343,7 @@
   [tag]
   (if (and tag (primitive? tag))
     tag
-    java.lang.Object))
+    System.Object))                                                             ;;; java.lang.Object
 
 (defn prim-interface [tags]
   (when (some primitive? tags)
@@ -397,7 +397,7 @@
 (defn ns->relpath [s]
   (-> s str (s/replace \. \/) (s/replace \- \_) (str ".clj")))
 
-(defn ns-url [ns]
-  (let [f (ns->relpath ns)]
-    (or (io/resource f)
-        (io/resource (str f "c")))))
+(defn ns-url [ns]            ;;; No equivalent
+   nil)                      ;;; (let [f (ns->relpath ns)]
+                             ;;;   (or (io/resource f)
+                             ;;;       (io/resource (str f "c"))))

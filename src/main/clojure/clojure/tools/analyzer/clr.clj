@@ -588,30 +588,31 @@
   ([ns] (analyze-ns ns (empty-env)))
   ([ns env] (analyze-ns ns env {}))
   ([ns env opts]
-     (env/ensure (global-env)
-       (let [res ^URL (ns-url ns)]                                           ;;; ******* Need to figure out what type for URL
-         (assert res (str "Can't find " ns " in classpath"))
-         (let [filename (str res)
-               path     (.getPath res)]                                      ;;;  ;;; ******* Need to figure out what type for URL so we know what is replacement for .getPath
-           (when-not (get-in (env/deref-env) [::analyzed-clj path])
-             (binding [*ns*   *ns*
-                       *file* filename]
-			   (with-open [rdr (io/text-reader res)]                                   ;;;  io/reader
-				 (let [pbr (clojure.lang.LineNumberingTextReader. rdr)                 ;;; (readers/indexing-push-back-reader
-																					   ;;; (java.io.PushbackReader. rdr) 1 filename)
-                       eof (Object.)
-                       read-opts {:eof eof :features #{:clj :t.a.jvm}}
-                       read-opts (if (.endsWith filename "cljc")                       ;;; .EndsWith
-                                   (assoc read-opts :read-cond :allow)
-                                   read-opts)]
-                   (loop []
-                     (let [form (reader/read read-opts pbr)]
-                       (when-not (identical? form eof)
-                         (swap! *env* update-in [::analyzed-clj path]
-                                (fnil conj [])
-                                (analyze+eval form (assoc env :ns (ns-name *ns*)) opts))
-                         (recur))))))))
-           (get-in @*env* [::analyzed-clj path]))))))
+	 (throw (NotImplementedException.))))    ;;; not sure how to encode this in our environment.
+     ;;;(env/ensure (global-env)
+     ;;;  (let [res ^URL (ns-url ns)]                                           ;;; ******* Need to figure out what type for URL
+     ;;;    (assert res (str "Can't find " ns " in classpath"))
+     ;;;    (let [filename (str res)
+     ;;;          path     (.getPath res)]                                      ;;;  ;;; ******* Need to figure out what type for URL so we know what is replacement for .getPath
+     ;;;      (when-not (get-in (env/deref-env) [::analyzed-clj path])
+     ;;;        (binding [*ns*   *ns*
+     ;;;                  *file* filename]
+	;;;		   (with-open [rdr (io/text-reader res)]                                   ;;;  io/reader
+	;;;			 (let [pbr (clojure.lang.LineNumberingTextReader. rdr)                 ;;; (readers/indexing-push-back-reader
+	;;;																				   ;;; (java.io.PushbackReader. rdr) 1 filename)
+    ;;;                   eof (Object.)
+    ;;;                   read-opts {:eof eof :features #{:clj :t.a.jvm}}
+    ;;;                   read-opts (if (.endsWith filename "cljc")                       ;;; .EndsWith
+    ;;;                               (assoc read-opts :read-cond :allow)
+    ;;;                               read-opts)]
+    ;;;               (loop []
+    ;;;                 (let [form (reader/read read-opts pbr)]
+    ;;;                   (when-not (identical? form eof)
+    ;;;                     (swap! *env* update-in [::analyzed-clj path]
+    ;;;                            (fnil conj [])
+    ;;;                            (analyze+eval form (assoc env :ns (ns-name *ns*)) opts))
+    ;;;                     (recur))))))))
+    ;;;       (get-in @*env* [::analyzed-clj path]))))))
 
 (defn macroexpand-all
   "Like clojure.walk/macroexpand-all but correctly handles lexical scope"
