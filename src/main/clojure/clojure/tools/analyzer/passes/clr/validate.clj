@@ -65,7 +65,7 @@
                               :ast   ast}
                              (source-info (:env ast)))))
       (let [^Type class (-> ast :class :val)                                              ;;; Class
-            c-name (symbol (.FullName class))                                             ;;; .getName
+            c-name '.ctor                                                                 ;;; (symbol (.getName class)) -- ctors are named .ctor, not with the class name
             argc (count args)
             tags (mapv :tag args)]
         (let [[ctor & rest] (->> (filter #(= (count (:parameter-types %)) argc)
