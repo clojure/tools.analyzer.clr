@@ -57,8 +57,8 @@
                 (-> ast
                   (assoc :class (assoc (ana/analyze-const the-class env :class)
                                   :form  (:form class)
-                                  :tag   Class
-                                  :o-tag Class)))
+                                  :tag   Type                                            ;;; Class
+                                  :o-tag Type)))                                         ;;; Class
                 ast)]
       (assoc-in ast [:local :tag]  (-> ast :class :val)))
 
