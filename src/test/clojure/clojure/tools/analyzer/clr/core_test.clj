@@ -63,7 +63,7 @@
     (is (= '#{ToString GetService} (->> r-ast :expr :methods (mapv :name) set))))                 ;;; #{toString append}
 
   (let [dt-ast (ast (deftype* x user.x [a b]
-                      :implements [IServiceProvider]                                              ;;; Appendable
+                      :implements [System.IServiceProvider]                                              ;;; Appendable
                       (GetService [this ^Type serviceType] this)))]                               ;;; (^Appendable append [this ^char x] this)
     (is (= :deftype (-> dt-ast :op)))
     (is (= '[a b] (->> dt-ast :fields (mapv :name))))
