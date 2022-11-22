@@ -345,10 +345,23 @@
     tag
     System.Object))                                                             ;;; java.lang.Object
 
+;;; We have to work a lot harder on this one.
+;;;
+;;;(defn prim-interface [tags]
+;;;  (when (some primitive? tags)
+;;;    (let [sig (apply str (mapv #(.toUpperCase (subs (.getSimpleName ^Class %) 0 1)) tags))] 
+;;;      (maybe-class (str "clojure.lang.IFn$" sig)))))
+;;; The idea is that if (in Java) tags is Long Object Double Object, then you extract LODO and look up "clojure.lang.IFn$LODO" to see if it is a class.
+;;; This would be one of the primitive interface types.
+;;; Our problem is that we have Int64 instead of Long, so we get "I" instead of "L".  Double and Object are okay.
+;;; We'll create a map mapping Int64, Double, Object to the correct character, and default every other type to something bogus.
+;;; Then do the class lookup. However, our classes are named clojure.lang.primifs.LODO, e.g.
+
 (defn prim-interface [tags]
   (when (some primitive? tags)
-    (let [sig (apply str (mapv #(.ToUpper (subs (.Name ^Type %) 0 1)) tags))]    ;;; .toUpperCase  .getSimpleName ^Class
-      (maybe-class (str "clojure.lang.IFn$" sig)))))
+    (let [sig (apply str (mapv #(get {Object "O" Int64 "L" Double "D"} % "x") tags))]
+	  (maybe-class (str "clojure.lang.primifs." sig)))))
+
 
 (defn tag-match? [arg-tags meth]
   (every? identity (map convertible? arg-tags (:parameter-types meth))))
