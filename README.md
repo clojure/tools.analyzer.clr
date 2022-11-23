@@ -2,13 +2,18 @@
 
 A port of [clojure/tools.analyzer.jvm](https://github.com/clojure/tools.analyzer.jvm) to ClojureCLR.
 
-THIS IS A WORK-IN-PROGRESS.  DO NOT USE. (YET.)
-
 From the parent's README:
 
 > An analyzer for Clojure code, written on top of [tools.analyzer](https://github.com/clojure/tools.analyzer), providing additional jvm-specific passes.
 
 Please see the JVM version's [README](https://github.com/clojure/tools.analyzer.jvm/blob/master/README.md) for more details.
+
+# Notes
+
+Fully functional except for two minor variations
+
+- `analyze-ns` is not yet implemented.  (The JVM version involves classpath searching and related techniques that are not relevant on the CLR.  This needs some thought.
+- The `earmuff-warning` pass is not included in the analysis. That code is defined in `tools.analyzer` and contains some interop not CLR-compatible.  We await a patch.
 
 # Releases
 
@@ -21,12 +26,9 @@ Nuget reference:
 Leiningen/Clojars reference:
 
 ```
-   [org.clojure.clr/tools.analyzer.clr "1.1.1"]
+   [org.clojure.clr/tools.analyzer.clr "1.2.2"]
 ```
    
-## Notes on the ported code
-
-Work in progress.
 
 ## License
 
