@@ -437,7 +437,7 @@
 (def default-passes
   "Set of passes that will be run by default on the AST by #'run-passes"
   #{#'warn-on-reflection
-    #'warn-earmuff
+    ;;; SKIPPING THIS ONE -- uhtil we can patch the code in tools.analyzer   ;;; #'warn-earmuff
 
     #'uniquify-locals
 

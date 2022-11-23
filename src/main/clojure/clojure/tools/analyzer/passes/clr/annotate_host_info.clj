@@ -14,8 +14,16 @@
              [elide-meta :refer [elide-meta]]]
             [clojure.tools.analyzer.utils :refer [source-info]]
             [clojure.tools.analyzer.clr.utils
-             :refer [members name-matches? try-best-match]
+             :refer [members name-matches? try-best-match maybe-class]            ;;; Added maybe-class
              :as u]))
+
+;;; Added this deal with explicit interface implementation.
+(defn explicit-implementation-name-matches 
+  [impl-method-name interface-method-name]
+  (let [member-name (str impl-method-name )
+        i (.LastIndexOf member-name ".")] 
+    (and (pos? i) (= (subs member-name (inc i)) (str interface-method-name)))))
+	
 
 (defn annotate-host-info
   "Adds a :methods key to reify/deftype :methods info representing
@@ -38,7 +46,8 @@
                                   (let [name (:name ast)
                                         argc (count (:params ast))]
                                     (assoc ast :methods
-                                           (filter #(and ((name-matches? name) (:name %))
+                                           (filter #(and (or ((name-matches? name) (:name %))
+										                     (explicit-implementation-name-matches name (:name %)))
                                                          (= argc (count (:parameter-types %))))
                                                    all-methods)))) methods)))
 
@@ -69,8 +78,19 @@
     (let [{:keys [name class tag form params fixed-arity env]} ast]
       (if interfaces
         (let [tags (mapv (comp u/maybe-class :tag meta :form) params)
-              methods-set (set (mapv (fn [x] (dissoc x :declaring-class :flags)) methods))]
-          (let [[m & rest :as matches] (try-best-match tags methods)]
+              methods-set (set (mapv (fn [x] (dissoc x :declaring-class :flags)) methods))
+			  methods-to-test 
+			  (let [method-name (str name)
+			        i (.LastIndexOf method-name ".")
+					explicit? (pos? i)]
+				 (if explicit?
+				   (let [name (subs method-name (inc i))
+				         i-name (subs method-name 0 i)
+						 i-class (maybe-class i-name)]
+				     (filter #(and (= name (str (:name %))) (= i-class (maybe-class (str (:declaring-class %)))))
+					         methods))
+				   methods))]
+          (let [[m & rest :as matches] (try-best-match tags methods-to-test)]
             (if m
               (let [ret-tag  (u/maybe-class (:return-type m))
                     i-tag    (u/maybe-class (:declaring-class m))
