@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+  </PropertyGroup>
+
+	<PropertyGroup>
+		<PackageId>clojure.tools.analyzer.clr</PackageId>
+		<RootNamespace>tools.analzyer</RootNamespace>
+		<Title>clojure.tools.analyzer.clr</Title>
+		<Product>clojure.tools.analyzer.clr</Product>
+		<AssemblyTitle>clojure.tools.analyzer.clr</AssemblyTitle>
+		<Authors>ClojureCLR Contributors</Authors>
+		<Description>A port of tools.analyzer.jmv to ClojureCLR.</Description>
+		<Copyright>Copyright © Rich Hickey, David Miller 2022</Copyright>
+		<PackageLicenseExpression>EPL-1.0</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/clojure/clojure.tools.namesapce</RepositoryUrl>
+		<Company>ClojureCLR contributors</Company>
+		<PackageTags>Clojure;ClojureCLR</PackageTags>
+		<Version>1.2.2</Version>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource CopyToOutputDirectory="Never" Include="..\..\clojure\clojure\tools\**\*" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="clojure.tools.analyzer" Version="1.1.0" />
+	</ItemGroup>
+
+</Project>

@@ -20,7 +20,7 @@ Fully functional except for two minor variations
 Nuget reference:
 
 ```
-    PM> Install-Package tools.analyzer.clr -Version 1.2.2 
+    PM> Install-Package clojure.tools.analyzer.clr -Version 1.2.2 
 ```
 	
 Leiningen/Clojars reference:
