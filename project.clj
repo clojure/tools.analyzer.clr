@@ -1,11 +1,11 @@
-(defproject org.clojure.clr/tools.analyzer.clr "1.2.2"
+(defproject org.clojure.clr/tools.analyzer.clr "1.2.3"
   :description "Port of clojure.org/tools.analyzer.clr to ClojureCLR"
   :url "https://github.com/clojure/tools.analyzer.clr"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :source-paths ["src/main/clojure" "src/main/lib"]
   :test-paths ["src/test/clojure"]			
-  :dependencies [[org.clojure/tools.analyzer "1.1.0"]
+  :dependencies [[org.clojure/tools.analyzer "1.1.1"]
                  [org.clojure.clr/core.memoize "1.0.257"]
 				 [org.clojure.clr/tools.reader "1.3.6"]]
   :deploy-repositories [["clojars" {:url "https://clojars.org/repo/"

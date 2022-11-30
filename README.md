@@ -10,23 +10,23 @@ Please see the JVM version's [README](https://github.com/clojure/tools.analyzer.
 
 # Notes
 
-Fully functional except for two minor variations
+Fully functional except:
 
 - `analyze-ns` is not yet implemented.  (The JVM version involves classpath searching and related techniques that are not relevant on the CLR.  This needs some thought.
-- The `earmuff-warning` pass is not included in the analysis. That code is defined in `tools.analyzer` and contains some interop not CLR-compatible.  We await a patch.
+
 
 # Releases
 
 Nuget reference:
 
 ```
-    PM> Install-Package clojure.tools.analyzer.clr -Version 1.2.2 
+    PM> Install-Package clojure.tools.analyzer.clr -Version 1.2.3 
 ```
 	
 Leiningen/Clojars reference:
 
 ```
-   [org.clojure.clr/tools.analyzer.clr "1.2.2"]
+   [org.clojure.clr/tools.analyzer.clr "1.2.3"]
 ```
    
 
