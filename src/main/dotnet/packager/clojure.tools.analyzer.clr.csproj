@@ -6,18 +6,18 @@
 
 	<PropertyGroup>
 		<PackageId>clojure.tools.analyzer.clr</PackageId>
-		<RootNamespace>tools.analzyer</RootNamespace>
+		<RootNamespace>clojure.tools</RootNamespace>
 		<Title>clojure.tools.analyzer.clr</Title>
 		<Product>clojure.tools.analyzer.clr</Product>
 		<AssemblyTitle>clojure.tools.analyzer.clr</AssemblyTitle>
 		<Authors>ClojureCLR Contributors</Authors>
-		<Description>A port of tools.analyzer.jmv to ClojureCLR.</Description>
-		<Copyright>Copyright © Rich Hickey, David Miller 2022</Copyright>
+		<Description>A port of tools.analyzer.jvm to ClojureCLR.</Description>
+		<Copyright>Copyright © Rich Hickey, David Miller 2023</Copyright>
 		<PackageLicenseExpression>EPL-1.0</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/clojure/clojure.tools.namesapce</RepositoryUrl>
 		<Company>ClojureCLR contributors</Company>
 		<PackageTags>Clojure;ClojureCLR</PackageTags>
-		<Version>1.2.3</Version>
+		<Version>1.2.3.1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

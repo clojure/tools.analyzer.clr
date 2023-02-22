@@ -20,13 +20,13 @@ Fully functional except:
 Nuget reference:
 
 ```
-    PM> Install-Package clojure.tools.analyzer.clr -Version 1.2.3 
+    PM> Install-Package clojure.tools.analyzer.clr -Version 1.2.3.1 
 ```
 	
 Leiningen/Clojars reference:
 
 ```
-   [org.clojure.clr/tools.analyzer.clr "1.2.3"]
+   [org.clojure.clr/tools.analyzer.clr "1.2.3.1"]
 ```
    
 
