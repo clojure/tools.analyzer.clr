@@ -17,7 +17,7 @@
 		<RepositoryUrl>https://github.com/clojure/clojure.tools.namesapce</RepositoryUrl>
 		<Company>ClojureCLR contributors</Company>
 		<PackageTags>Clojure;ClojureCLR</PackageTags>
-		<Version>1.2.3.1</Version>
+		<Version>1.2.4</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -25,7 +25,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="clojure.core.memoize" Version="1.0.257" />
 	  <PackageReference Include="clojure.tools.analyzer" Version="1.1.1" />
+	  <PackageReference Include="clojure.tools.reader" Version="1.3.7" />
 	</ItemGroup>
 
 </Project>
