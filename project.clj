@@ -6,8 +6,8 @@
   :source-paths ["src/main/clojure" "src/main/lib"]
   :test-paths ["src/test/clojure"]			
   :dependencies [[org.clojure/tools.analyzer "1.1.1"]
-                 [org.clojure.clr/core.memoize "1.0.257"]
-				 [org.clojure.clr/tools.reader "1.3.7"]]
+                 [org.clojure.clr/core.memoize "1.0.266"]
+				 [org.clojure.clr/tools.reader "1.5.0"]]
   :deploy-repositories [["clojars" {:url "https://clojars.org/repo/"
                                     :sign-releases  false}]]  
   :min-lein-version "2.0.0"
