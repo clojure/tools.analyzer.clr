@@ -81,7 +81,7 @@
   (RT/classForName
     (str (-> element-type                                     ;;; (str "[" (-> element-type
              maybe-class                                      ;;;            maybe-class
-             .GetFullName                                     ;;;            Type/getType
+             .FullName                                     ;;;            Type/getType
             (.Replace \/ \.))                                  ;;;            .getDescriptor
           "[]")))                                             ;;;            (.replace \/ \.)))
 			  
