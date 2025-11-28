@@ -1,4 +1,4 @@
-(defproject org.clojure.clr/tools.analyzer.clr "1.2.4"
+(defproject org.clojure.clr/tools.analyzer.clr "1.3.2"
   :description "Port of clojure.org/tools.analyzer.clr to ClojureCLR"
   :url "https://github.com/clojure/tools.analyzer.clr"
   :license {:name "Eclipse Public License"
