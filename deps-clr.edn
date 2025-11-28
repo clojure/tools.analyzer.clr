@@ -1,0 +1,16 @@
+{:paths ["src/main/clojure"]
+ :deps
+ {
+   io.github.clojure/clr.tools.reader {:git/tag "v1.5.2" :git/sha "1a7a8e9"}
+   io.github.clojure/clr.core.memoize {:git/tag "v1.1.266" :git/sha "a1a7f68"}
+   io.github.clojure/tools.analyzer {:git/sha "4512ef15cea0559a507d0113be99072c9ce3f2f8"}
+ }
+
+ :aliases
+ {:test
+  {:extra-paths ["src/test/clojure"]
+   :extra-deps {io.github.dmiller/test-runner {:git/sha "c055ea13d19c6a9b9632aa2370fcc2215c8043c3"}}
+   :exec-fn cognitect.test-runner.api/test
+   :exec-args {:dirs ["src/test/clojure"]}}}}
+   
+   
