@@ -100,7 +100,7 @@
 			  
 (defn maybe-class-from-string [^String s]
   (or (when-let [maybe-class (and (neg? (.IndexOf s "."))                             ;;; .indexOf
-                                  (not= \[ (first s))
+                                  (not= \] (last s))                                  ;;; (not= \[ (first s))
                                   (if env/*env*
                                     (u/resolve-sym (symbol s) {:ns (ns-name *ns*)})
                                     ((ns-map *ns*) (symbol s))))]
@@ -112,24 +112,36 @@
 (defmethod maybe-class Type [c] c)                                                    ;;; Class
 (defmethod maybe-class String [s]
   (maybe-class (symbol s)))
+  
+(defn maybe-array-class-sym [x]
+  (let [sname (name x)]
+    (if-let [c (and (= (count sname) 1)
+                    (Char/IsDigit (first sname))                                ;;; Character/isDigit
+                    (namespace x))]
+      (when-let [c (or (specials c)
+                       (maybe-class-from-string c))]
+        (array-class (Int32/Parse sname) c)))))                                 ;;; Integer/parseInt
 
 (defmethod maybe-class Symbol [sym]
-  (when-not (namespace sym)
-    (let [sname (name sym)
-          snamec (count sname)]
-      (if-let [base-type (and (.EndsWith sname "<>")                                 ;;; .endsWith
-                              (maybe-class (subs sname 0 (- snamec 2))))]
-        (array-class base-type)
-        (if-let [ret (or (specials sname)
-                         (special-arrays sname))]
-          ret
-          (maybe-class-from-string sname))))))
+  (let [sname (name sym)
+        snamec (count sname)]
+    (or (maybe-array-class-sym sym)
+        (when-not (namespace sym)
+          (if-let [base-type (and (.EndsWith sname "<>")                        ;;; .endsWith
+                                  (maybe-class (subs sname 0 (- snamec 2))))]
+            ;; TODO: we're leaking into the syntax
+            (array-class base-type)
+            (if-let [ret (or (specials sname)
+                             (special-arrays sname))]
+              ret
+              (maybe-class-from-string sname)))))))
 
 (defn maybe-class-literal [x]
   (cond
    (class? x) x
-   (symbol? x) (and (not (namespace x))
-                    (maybe-class-from-string (name x)))
+   (symbol? x) (or (maybe-array-class-sym x)
+                    (and (not (namespace x))
+                         (maybe-class-from-string (name x))))
    (string? x) (maybe-class-from-string x)))
 
 (def primitive?
