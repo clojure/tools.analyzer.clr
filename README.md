@@ -17,16 +17,23 @@ Fully functional except:
 
 # Releases
 
+Latest stable release: 1.3.2
+
+[CLI/`deps.edn`](https://clojure.org/reference/deps_edn) dependency information:
+```clojure
+io.github.clojure/tools.analyzer.clr {:git/tag "v1.3.2" :git/sha "732a0f4"}
+```
+
 Nuget reference:
 
 ```
-    PM> Install-Package clojure.tools.analyzer.clr -Version 1.2.4 
+    PM> Install-Package clojure.tools.analyzer.clr -Version 1.3.2 
 ```
 	
 Leiningen/Clojars reference:
 
 ```
-   [org.clojure.clr/tools.analyzer.clr "1.2.4"]
+   [org.clojure.clr/tools.analyzer.clr "1.3.2"]
 ```
    
 
