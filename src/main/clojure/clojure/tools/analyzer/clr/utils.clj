@@ -116,7 +116,7 @@
 (defn maybe-array-class-sym [x]
   (let [sname (name x)]
     (if-let [c (and (= (count sname) 1)
-                    (Char/IsDigit (first sname))                                ;;; Character/isDigit
+                    (Char/IsDigit (char (first sname)))                         ;;; Character/isDigit
                     (namespace x))]
       (when-let [c (or (specials c)
                        (maybe-class-from-string c))]
