@@ -6,6 +6,8 @@
             [clojure.tools.analyzer.passes.elide-meta :refer [elides elide-meta]]
             [clojure.tools.analyzer.ast :refer [postwalk]]
             [clojure.test :refer [deftest is]]))
+			
+(assembly-load-from (str clojure.lang.RT/SystemRuntimeDirectory "System.ComponentModel.dll"))
 
 (defprotocol p (f [_]))
 (defn f1 [^long x])
