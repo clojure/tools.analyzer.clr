@@ -434,6 +434,9 @@
                    (conj p next)))) [] methods)
       methods)))
 
+(defn param-tags-of [sym]
+  (-> sym meta :param-tags))
+
 (defn ns->relpath [s]
   (-> s str (s/replace \. \/) (s/replace \- \_) (str ".clj")))
 
