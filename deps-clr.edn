@@ -1,9 +1,9 @@
-{:paths ["src/main/clojure"]
+{:paths ["src/main/clojure" "src/test/clojure"]
  :deps
  {
    io.github.clojure/clr.tools.reader {:git/tag "v1.5.2" :git/sha "1a7a8e9"}
    io.github.clojure/clr.core.memoize {:git/tag "v1.1.266" :git/sha "a1a7f68"}
-   io.github.clojure/tools.analyzer {:git/sha "4512ef15cea0559a507d0113be99072c9ce3f2f8"}
+   io.github.clojure/tools.analyzer {:git/sha "bb895828a64327b8c5d1370e396271c8e519dfae"}
  }
 
  :aliases
