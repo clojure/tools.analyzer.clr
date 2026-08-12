@@ -111,7 +111,22 @@
                                     :args  (mapv (fn [a] (prewalk a cleanup)) args)}
                                    (source-info (:env ast)))))))))))
 
-(defn validate-call [{:keys [class instance method args tag env op] :as ast}]
+(defn- found-method [ast args tag instance? instance m]
+  (let [ret-tag  (:return-type m)
+        arg-tags (mapv u/maybe-class (:parameter-types m))
+        args (mapv (fn [arg tag] (assoc arg :tag tag)) args arg-tags)
+        class (u/maybe-class (:declaring-class m))]
+    (merge' ast
+            {:method     (:name m)
+             :validated? true
+             :class      class
+             :o-tag      ret-tag
+             :tag        (or tag ret-tag)
+             :args       args}
+            (if instance?
+              {:instance (assoc instance :tag class)}))))
+
+(defn validate-call [{:keys [class instance method args tag env op param-tags] :as ast}]
   (let [argc (count args)
         instance? (= :instance-call op)
         f (if instance? u/instance-methods u/static-methods)
