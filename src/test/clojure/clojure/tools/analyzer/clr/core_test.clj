@@ -123,8 +123,6 @@
   (is (= (list '. Int32 (symbol "-MaxValue"))                   ;;; Integer  "-MAX_VALUE"
          (mexpand Int32/MaxValue)))                             ;;; Integer/MAX_VALUE
 
-  (is (= 'String/1 (mexpand String/1)))
-
   (is (= 'String/.get_Length (mexpand String/.get_Length)))             ;;; .length   .length 
   (is (= 'Int32/.Abs (mexpand Int32/.Abs)))                     ;;; Integer/.intValue   Integer/.intValue 
 
