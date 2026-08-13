@@ -8,7 +8,8 @@
             [clojure.set :as set]
             [clojure.tools.analyzer.passes.add-binding-atom :refer [add-binding-atom]]
             [clojure.tools.analyzer.passes.collect-closed-overs :refer [collect-closed-overs]]
-            [clojure.tools.analyzer.clr.core-test :refer [ast ast1 e f f1]]
+            [clojure.tools.reader :as r]
+            [clojure.tools.analyzer.clr.core-test :refer [ast ast1 ana e f f1]]
             [clojure.tools.analyzer.passes.clr.emit-form
              :refer [emit-form emit-hygienic-form]]
             [clojure.tools.analyzer.passes.clr.validate :as v]
@@ -22,7 +23,8 @@
             [clojure.tools.analyzer.passes.clr.classify-invoke :refer [classify-invoke]])
   (:import (clojure.lang Keyword Var Symbol AFunction
                          PersistentVector PersistentArrayMap PersistentHashSet ISeq)
-           System.Text.RegularExpressions.Regex))                                                         ;;;
+           System.Text.RegularExpressions.Regex
+		   (System.IO FileInfo)))                                                         ;;;
 
 (defn validate [ast]
   (env/with-env (ana.clr/global-env)
@@ -31,8 +33,8 @@
 (deftest emit-form-test
   (is (= '(monitor-enter 1) (emit-form (ast (monitor-enter 1)))))
   (is (= '(monitor-exit 1) (emit-form (ast (monitor-exit 1)))))
-  (is (= '(clojure.core/import* "System.String")                                     ;;; "java.lang.String"
-         (emit-form (validate (ast (clojure.core/import* "System.String"))))))                      ;;; "java.lang.String"
+  (is (= '(clojure.core/import* "System.String")                                                ;;; "java.lang.String"
+         (emit-form (validate (ast (clojure.core/import* "System.String"))))))                  ;;; "java.lang.String"
   (is (= '(var clojure.core/+) (emit-form (ast #'+))))
   (is (= '(:foo {}) (emit-form (ast (:foo {})))))
   (is (= '(try 1 (catch Exception e nil))
@@ -70,7 +72,7 @@
   (is (= PersistentVector (-> (ast []) annotate-tag :tag)))
   (is (= PersistentArrayMap(-> (ast {}) annotate-tag :tag)))
   (is (= PersistentHashSet (-> (ast #{}) annotate-tag :tag)))
-  (is (= System.RuntimeType (-> {:op :const :type :class :form Object :val Object}                       ;;; Class
+  (is (= System.RuntimeType (-> {:op :const :type :class :form Object :val Object}         ;;; Class
                  annotate-tag :tag)))
   (is (= String (-> (ast "foo") annotate-tag :tag)))
   (is (= Keyword (-> (ast :foo) annotate-tag :tag)))
@@ -161,3 +163,134 @@
                        {:passes-opts (merge ana.clr/default-passes-opts
                                             {:validate/wrong-tag-handler (fn [t ast]
                                                                            {t nil})})})))
+																		   
+(deftest method-value-emit-form-test
+  (is (= 'System.IO.FileInfo/.get_Name (emit-form (ast1 FileInfo/.get_Name))))                       ;;; java.io.File/.getName   File/.getName  TODO: When we get QMEs working on instance properties, add a test for FileInfo/.Name
+
+  (is (= 'System.String/IsNullOrWhiteSpace (emit-form (ast1 String/IsNullOrWhiteSpace))))         ;;; java.lang.String/valueOf  String/valueOf
+
+  (is (= 'System.IO.FileInfo/new (emit-form (ast1 FileInfo/new))))                                   ;;; java.io.File
+
+  (let [emitted (emit-form (ana (r/read-string "^[long] Math/Abs")))]                      ;;;   String/valueOf  -- needed to find something overloaded that had an Int64 parameter
+    (is (= 'System.Math/Abs emitted))                                                       	;;; java.lang.String/valueOf
+    (is (= '[long] (:param-tags (meta emitted)))))
+
+  (let [emitted (emit-form (ana (r/read-string "^[int int] String/.Substring")))]          ;;; .substring
+    (is (= 'System.String/.Substring emitted))                                             ;;; java.lang.String/.substring
+    (is (= '[int int] (:param-tags (meta emitted))))))
+
+(deftest method-value-validate-test
+  (let [a (ast1 FileInfo/.get_Name)]                               ;;; File/.getName
+    (is (= :method-value (:op a)))
+    (is (:validated? a))
+    (is (= System.IO.FileInfo (:class a))))                        ;;; java.io.File
+
+  (let [a (ast1 Math/Abs)]                                         ;;; String/valueOf
+    (is (= :method-value (:op a)))
+    (is (:validated? a))
+    (is (pos? (count (:methods a)))))
+
+  (let [a (ast1 FileInfo/new)]                                     ;;; File
+    (is (= :method-value (:op a)))
+    (is (:validated? a))
+    (is (= :ctor (:kind a))))
+
+  (let [a (ana (r/read-string "^[long] Math/Abs"))]                ;;; String/valueOf
+    (is (= :method-value (:op a)))
+    (is (:validated? a))
+    (is (= 1 (count (:methods a)))))
+
+  (let [a (ana (r/read-string "^[int int] String/.Substring"))]    ;;; .substring
+    (is (= :method-value (:op a)))
+    (is (:validated? a))
+    (is (= 1 (count (:methods a))))))
+
+(deftest method-value-kinds-test
+  (let [a (ast1 FileInfo/.get_Exists)]                                 ;;; File/.isDirectory
+    (is (= :instance (:kind a)))
+    (is (= 'get_Exists (:method a))))                                  ;;; isDirectory
+
+  (let [a (ast1 Char/IsDigit)]                                     ;;; Character/isDigit
+    (is (= :method-value (:op a)))
+    (is (= :static (:kind a)))
+    (is (= 'IsDigit (:method a)))                                  ;;; isDigit
+    (is (< 1 (count (:methods a)))))
+
+  (let [a (ast1 String/new)]
+    (is (= :ctor (:kind a)))
+    (is (= String (:class a))))
+
+  (let [a (ast1 FileInfo/.get_Name)]                               ;;; File/.getName
+    (is (= AFunction (:o-tag a)))))
+
+(deftest method-value-field-overload-test
+  (let [a (ast1 Int32/MaxValue)]                                   ;;; Integer/MAX_VALUE
+    (is (= :static-field (:op a))))
+
+  (let [a (ast1 Boolean/FalseString)]                              ;;; TRUE
+    (is (= :static-field (:op a)))))
+
+(deftest qualified-method-invocation-test
+  (let [a (ast1 (FileInfo/new "."))]                               ;;; File
+    (is (= :new (:op a))))
+
+  (let [a (ast1 (String/.get_Length "hello"))]                                        ;;; .length
+    (is (= :instance-call (:op a)))
+    (is (= 'get_Length (:method a)))                                                  ;;; length
+    (is (:validated? a)))
+
+  (let [a (ast1 (String/.Substring "hello" 1 3))]                                 ;;; .substring
+    (is (= :instance-call (:op a)))
+    (is (= 'Substring (:method a)))                                               ;;; substring
+    (is (= 2 (count (:args a)))))
+
+  (let [a (ast1 (Int32/Parse "7"))]                                               ;;; Integer/parseInt
+    (is (= :static-call (:op a)))
+    (is (= 'Parse (:method a)))                                                   ;;; parseInt
+    (is (:validated? a)))
+
+  (let [a (ast1 (FileInfo/.get_Exists (FileInfo. ".")))]                          ;;; File/.isDirectory    File. 
+    (is (= :instance-call (:op a)))
+    (is (= 'get_Exists (:method a)))))                                            ;;; isDirectory
+
+(deftest param-tags-invocation-test
+  (let [a (ana (r/read-string "(^[long] Math/Abs 42)"))]                          ;;; String/valueOf
+    (is (= :static-call (:op a)))
+    (is (:validated? a))
+    (is (= '[long] (:param-tags a))))
+
+  (let [a (ana (r/read-string "(^[int int] String/.Substring \"hello\" 1 3)"))]   ;;; .substring
+    (is (= :instance-call (:op a))) 
+    (is (:validated? a))
+    (is (= '[int int] (:param-tags a))))
+
+  (let [a (ana (r/read-string "(^[int _] String/.Substring \"hello\" 1 3)"))]     ;;; .substring
+    (is (= :instance-call (:op a)))
+    (is (:validated? a))
+    (is (= '[int _] (:param-tags a))))
+
+  #_(let [a (ana (r/read-string "^[int/1] java.util.Arrays/sort"))]
+    (is (= :method-value (:op a)))
+    (is (= :static (:kind a)))
+    (is (= 1 (count (:methods a))))))
+
+(deftest existing-interop-unchanged-test
+  (let [a (ast1 (.get_Length "hello"))]                                               ;;; .length
+    (is (= :instance-call (:op a)))
+    (is (:validated? a)))
+
+  (let [a (ast1 (String. (.ToCharArray "foo")))]
+    (is (= :new (:op a)))
+    (is (:validated? a)))
+
+  (is (= System.Object (:tag (ast1 (.WriteLine System.Console "foo")))))            ;;;  Void/TYPE .println System/out
+
+  (let [a (ast1 (Int32/Parse "7"))]                                               ;;; Integer/parseInt
+    (is (= :static-call (:op a)))
+    (is (:validated? a)))
+
+  (let [a (ast1 Int32/MaxValue)]                                    ;;; Integer/MAX_VALUE
+    (is (= :static-field (:op a))))
+
+  #_(let [a (ast1 Boolean/TYPE)]
+    (is (= :static-field (:op a)))))

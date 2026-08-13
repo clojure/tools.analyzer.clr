@@ -6,7 +6,8 @@
             [clojure.tools.analyzer.passes.elide-meta :refer [elides elide-meta]]
             [clojure.tools.analyzer.ast :refer [postwalk]]
             [clojure.tools.reader :as r]
-            [clojure.test :refer [deftest is]]))
+            [clojure.test :refer [deftest is]])
+  (:import (System.IO FileInfo)))                                                                            ;;; java.io File
 			
 (assembly-load-from (str clojure.lang.RT/SystemRuntimeDirectory "System.ComponentModel.dll"))
 
@@ -117,3 +118,77 @@
 	
 (deftest array_class
   (is (ana (r/read-string "(fn [^{:tag int/2} x] (instance? int/2 x))"))))	
+  
+(deftest macroexpander-qualified-methods-test
+  (is (= (list '. Int32 (symbol "-MaxValue"))                   ;;; Integer  "-MAX_VALUE"
+         (mexpand Int32/MaxValue)))                             ;;; Integer/MAX_VALUE
+
+  (is (= 'String/1 (mexpand String/1)))
+
+  (is (= 'String/.get_Length (mexpand String/.get_Length)))             ;;; .length   .length 
+  (is (= 'Int32/.Abs (mexpand Int32/.Abs)))                     ;;; Integer/.intValue   Integer/.intValue 
+
+  (is (= 'String/new (mexpand String/new)))
+
+  (is (= 'String/IsNullOrWhiteSpace (mexpand String/IsNullOrWhiteSpace)))     ;;; String/valueOf
+  (is (= 'Int32/Parse (mexpand Int32/Parse)))                                 ;;; Integer/parseInt  Integer/parseInt
+
+  (let [expanded (mexpand (String/new "hello"))]
+    (is (= 'new (first expanded)))
+    (is (= System.String (second expanded))))                    ;;; java.lang.String
+
+  (let [expanded (mexpand (String/.Substring "hello" 1 3))]      ;;;  .substring
+    (is (= '. (first expanded)))
+    (is (= '(do "hello") (second expanded)))
+    (is (= String (:tag (meta (second expanded)))))
+    (is (= 'Substring (first (nth expanded 2)))))                ;;; substring
+
+  (let [expanded (mexpand (String/.get_Length "hello"))]             ;;; .length
+    (is (= '. (first expanded)))
+    (is (= 'get_Length (nth expanded 2))))                           ;;; length
+
+  (let [expanded (mexpand (Int32/Parse "2"))]                    ;;; Integer/parseInt
+    (is (= '. (first expanded)))
+    (is (= System.Int32 (second expanded)))))                    ;;; java.lang.Integer
+
+(deftest analyzer-qualified-methods-test
+  (let [a (ast1 FileInfo/.get_Name)]                             ;;; File/.getName   TODO:  When we can handle instance properties with QME, add an example for FileInfo/.Name
+    (is (= :method-value (:op a)))
+    (is (= :instance (:kind a)))
+    (is (= 'get_Name (:method a)))                               ;;; getName 
+    (is (= System.IO.FileInfo (:class a))))                      ;;; java.io.File
+
+  (let [a (ast1 String/IsNullOrWhiteSpace)]                      ;;; String/valueOf
+    (is (= :method-value (:op a)))
+    (is (= :static (:kind a)))
+    (is (= 'IsNullOrWhiteSpace (:method a)))                     ;;; valueOf
+    (is (= String (:class a))))
+
+  (let [a (ast1 FileInfo/new)]                                   ;;; File
+    (is (= :method-value (:op a)))
+    (is (= :ctor (:kind a)))
+    (is (= System.IO.FileInfo (:class a))))                      ;;; java.io.File 
+
+  (let [a (ast1 Int32/MaxValue)]                                 ;;; Integer/MAX_VALUE
+    (is (= :static-field (:op a)))
+    (is (= Int32 (:class a))))                                   ;;; Integer
+
+  (let [a (ana (r/read-string "String/1"))]
+    (is (= :const (:op a)))
+    (is (= :class (:type a)))
+    (is (.IsArray ^Type (:val a))))                              ;;; .isArray ^Class
+
+  (let [a (ast1 (FileInfo/new "."))]                             ;;; File
+    (is (= :new (:op a))))
+
+  (let [a (ast1 (String/.get_Length "hello"))]                       ;;; .length
+    (is (= :instance-call (:op a)))
+    (is (= 'get_Length (:method a))))                                ;;; length
+
+  (let [a (ast1 (String/.Substring "hello"1 3))]                 ;;; .substring
+    (is (= :instance-call (:op a)))
+    (is (= 'Substring (:method a))))                             ;;; substring
+
+  (let [a (ast1 (Int32/Parse "7"))]                              ;;; Integer/parseInt
+    (is (= :static-call (:op a)))
+    (is (= 'Parse (:method a)))))                                ;;; parseInt

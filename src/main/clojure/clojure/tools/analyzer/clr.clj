@@ -129,6 +129,7 @@
                          (maybe-class-literal sym-ns))]
       (let [opname (name form)
             opsym (symbol opname)]
+
         (cond
           ;; Array/<n>, leave as is
           (and (= (count opname) 1)

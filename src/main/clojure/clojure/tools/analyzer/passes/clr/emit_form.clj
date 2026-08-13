@@ -149,7 +149,7 @@
 
 (defmethod -emit-form :method-value
   [{:keys [class method kind param-tags]} opts]
-  (let [class-name (if (symbol? class) (name class) (.Name ^Type class))        ;;; .getName ^Class
+  (let [class-name (if (symbol? class) (name class) (.FullName ^Type class))        ;;; .getName ^Class
         sym (case kind
               :static   (symbol class-name (str method))
               :instance (symbol class-name (str "." method))

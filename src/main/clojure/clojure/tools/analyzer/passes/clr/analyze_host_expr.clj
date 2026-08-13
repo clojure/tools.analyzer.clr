@@ -212,7 +212,7 @@
                                field-sym)
                 methods      (case kind
                                :ctor
-                               (members the-class (symbol (.Name ^Type the-class)))                ;;; .getName ^Class 
+                               (members the-class '.ctor)                                              ;;; (members the-class (symbol (.FullName ^Type the-class)))                ;;; .getName ^Class  -- different naming convention for constructors
 
                                :static
                                (filter :return-type (static-members the-class method-name))
