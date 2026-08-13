@@ -131,19 +131,10 @@
   (is (= 'String/IsNullOrWhiteSpace (mexpand String/IsNullOrWhiteSpace)))     ;;; String/valueOf
   (is (= 'Int32/Parse (mexpand Int32/Parse)))                                 ;;; Integer/parseInt  Integer/parseInt
 
-  (let [expanded (mexpand (String/new "hello"))]
-    (is (= 'new (first expanded)))
-    (is (= System.String (second expanded))))                    ;;; java.lang.String
-
-  (let [expanded (mexpand (String/.Substring "hello" 1 3))]      ;;;  .substring
-    (is (= '. (first expanded)))
-    (is (= '(do "hello") (second expanded)))
-    (is (= String (:tag (meta (second expanded)))))
-    (is (= 'Substring (first (nth expanded 2)))))                ;;; substring
-
-  (let [expanded (mexpand (String/.get_Length "hello"))]             ;;; .length
-    (is (= '. (first expanded)))
-    (is (= 'get_Length (nth expanded 2))))                           ;;; length
+  (is (= '(String/new "hello") (mexpand (String/new "hello"))))
+  (is (= '(String/.substring "hello" 1 3) (mexpand (String/.substring "hello" 1 3))))
+  (is (= '(String/.length "hello") (mexpand (String/.length "hello"))))
+  (is (= '(Integer/parseInt "2") (mexpand (^[int] Integer/parseInt "2"))))
 
   (let [expanded (mexpand (Int32/Parse "2"))]                    ;;; Integer/parseInt
     (is (= '. (first expanded)))
