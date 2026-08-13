@@ -6,9 +6,9 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(ns clojure.tools.analyzer.passes.jvm.process-method-value
+(ns clojure.tools.analyzer.passes.clr.process-method-value
   (:require [clojure.tools.analyzer.utils :refer [source-info]]
-            [clojure.tools.analyzer.passes.jvm.analyze-host-expr :refer [analyze-host-expr]]))
+            [clojure.tools.analyzer.passes.clr.analyze-host-expr :refer [analyze-host-expr]]))
 
 (defn process-method-value
   "Transforms :invoke nodes whose :fn is a :method-value into the
