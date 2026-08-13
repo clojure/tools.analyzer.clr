@@ -134,7 +134,7 @@
   (is (= '(String/new "hello") (mexpand (String/new "hello"))))
   (is (= '(String/.substring "hello" 1 3) (mexpand (String/.substring "hello" 1 3))))
   (is (= '(String/.length "hello") (mexpand (String/.length "hello"))))
-  (is (= '(Integer/parseInt "2") (mexpand (^[int] Integer/parseInt "2"))))
+  (is (= '(Integer/parseInt "2") (mexpand (^{:param-tags [String]} Integer/parseInt "2"))))
 
   (let [expanded (mexpand (Int32/Parse "2"))]                    ;;; Integer/parseInt
     (is (= '. (first expanded)))
