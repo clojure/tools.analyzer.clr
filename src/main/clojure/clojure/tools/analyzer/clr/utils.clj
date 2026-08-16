@@ -306,7 +306,7 @@
 (def object-members
   (:members (type-reflect Object)))
 
-(def members*
+#_(def members*
   (lru (fn members*
          ([class]
           (into object-members
@@ -319,7 +319,30 @@
                             symbol
                             (type-reflect :ancestors true)
                             :members)))))))
+							
+							
 
+(def members*
+  (lru (fn members*
+         ([class]
+		  (let [class-sym (symbol (.FullName ^Type class))
+		        first-list (remove (fn [{:keys [flags]}]
+                          (not-any? #{:public :protected} flags))
+                        (-> class
+                            maybe-class
+                            ^Type (box)                                   ;;; Class
+                            .FullName                                      ;;; .getName
+                            symbol
+                            (type-reflect :ancestors true)
+                            :members))
+
+				 second-list (remove (fn [m] (and (or (= (:name m) '.ctor)                   ;;; Needed to add an extra step to exclude constructors from base classes.   It was messing up things in analyze-host-expr.
+						                              (= (:name m) '..ctor))
+						                          (not= (:declaring-class m) class-sym)))
+									 first-list)]
+			second-list)))))
+							
+							
 (defn members
   ([class] (members* class))
   ([class member]
