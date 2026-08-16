@@ -452,16 +452,34 @@
                    (or (nil? pc) ;; nil is a wildcard
                        (= pc (maybe-class mp))))
                  (map vector param-classes method-params)))))
+				 
+;;; Example of overload issue:  (^[] Int64/ToString 42)
+;;; There are three methods with signature [] on Int64, declared by Object, IConvertible, Int64.
+;;; We pass in the class we are working with, Int64 in this case, so we can prefer that one 
 
-(defn resolve-hinted-method
+#_(defn resolve-hinted-method
   "Given a class, method name and param-tags, resolves to the unique matching method.
    Returns nil if no match or if ambiguous."
- [methods param-tags]
+ [class methods param-tags]
   (let [param-classes (tags-to-maybe-classes param-tags)
         matching (filter #(signature-matches? param-classes %) methods)]
     (when (= 1 (count matching))
       (first matching))))
-
+  
+	  
+(defn resolve-hinted-method
+  "Given a class, method name and param-tags, resolves to the unique matching method.
+   Returns nil if no match or if ambiguous."
+ [class methods param-tags]                                                                   ;;; Added 'class' to help resolve on some overloading issues
+  (let [param-classes (tags-to-maybe-classes param-tags)
+        matching (filter #(signature-matches? param-classes %) methods)
+        class-sym (symbol (.FullName ^Type class))
+	    matching (if (> (count matching) 1)                                                   ;;; Added this to try to filter to unique based on declaringtype
+		           (filter #(= (:declaring-class %) class-sym) matching)
+				   matching)]
+	(when (= 1 (count matching))
+	  (first matching))))
+  
 
 (defn ns->relpath [s]
   (-> s str (s/replace \. \/) (s/replace \- \_) (str ".clj")))

@@ -54,7 +54,7 @@
                                (source-info env))))))))
 
 (defn- resolve-method-by-param-tags [methods param-tags ^Type class desc env]                ;;; ^Class
-  (or (resolve-hinted-method methods param-tags)
+  (or (resolve-hinted-method class methods param-tags)                                             ;;; Added extra parameter to resolve-hinted-method to deal with some overloading situations
       (throw (ex-info (str "param-tags " (pr-str param-tags)
                            " insufficient to resolve " desc
                            " in class " (.FullName class))                                   ;;; .getName
@@ -113,7 +113,7 @@
       (let [^Type class (-> ast :class :val)]                                                                                   ;;; ^Class 
         (if param-tags
           (-> ast (tag-args-from-method (resolve-method-by-param-tags methods param-tags class "constructor" (:env ast))))
-          (let [c-name (symbol (.FullName class))                                                                               ;;; .getName
+          (let [c-name '.ctor   ;;;  let's see if this works(symbol (.FullName class))                                                                               ;;; .getName
                 argc (count args)
                 tags (mapv :tag args)
                 [ctor & rest] (->> (filter #(= (count (:parameter-types %)) argc)

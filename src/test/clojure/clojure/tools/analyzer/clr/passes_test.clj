@@ -21,10 +21,11 @@
             [clojure.tools.analyzer.passes.clr.fix-case-test :refer [fix-case-test]]
             [clojure.tools.analyzer.passes.clr.analyze-host-expr :refer [analyze-host-expr]]
             [clojure.tools.analyzer.passes.clr.classify-invoke :refer [classify-invoke]])
-  (:import (clojure.lang Keyword Var Symbol AFunction
+  (:import (clojure.lang Keyword Var Symbol AFunction ExceptionInfo
                          PersistentVector PersistentArrayMap PersistentHashSet ISeq)
            System.Text.RegularExpressions.Regex
-		   (System.IO FileInfo)))                                                         ;;;
+		   (System.IO FileInfo)
+		   #_(java.util UUID Arrays)))                                                         ;;;
 
 (defn validate [ast]
   (env/with-env (ana.clr/global-env)
@@ -294,3 +295,74 @@
 
   #_(let [a (ast1 Boolean/TYPE)]
     (is (= :static-field (:op a)))))
+
+(deftest bad-method-names-test
+  (is (thrown? ExceptionInfo (ast1 String/foo)))
+  (is (thrown? ExceptionInfo (ast1 String/.foo)))
+  (is (thrown? ExceptionInfo (ast1 Math/new))))
+
+(deftest param-tags-method-signature-selection-test
+  (let [a (ana (r/read-string "^[double] Math/Abs"))]               ;;; abs
+    (is (= :method-value (:op a)))
+    (is (= 1 (count (:methods a))))
+    (is (:validated? a)))
+
+  (let [a (ana (r/read-string "^[float] Math/Abs"))]               ;;; abs
+    (is (= :method-value (:op a)))
+    (is (= 1 (count (:methods a))))
+    (is (:validated? a)))
+
+  (let [a (ana (r/read-string "^[long] Math/Abs"))]               ;;; abs
+    (is (= :method-value (:op a)))
+    (is (= 1 (count (:methods a))))
+    (is (:validated? a)))
+
+  (let [a (ana (r/read-string "^[int] Math/Abs"))]               ;;; abs
+    (is (= :method-value (:op a)))
+    (is (= 1 (count (:methods a))))
+    (is (:validated? a))))
+
+(deftest param-tags-constructor-invocation-test
+  (let [a (ana (r/read-string "(^[String] System.Guid/new \"1\")"))]              ;;; "(^[long long] java.util.UUID/new 1 2)"
+    (is (= :new (:op a)))
+    (is (:validated? a))
+    (is (= '[String] (:param-tags a))))                                ;;; '[long long]
+
+  (let [a (ana (r/read-string "(^[Character int] String/new \\a (int 12))"))]               ;;; "(^[String] String/new \"a\")"
+    (is (= :new (:op a)))
+    (is (:validated? a))
+    (is (= '[Character int] (:param-tags a)))))
+
+(deftest param-tags-no-arg-invocation-test
+  (let [a (ana (r/read-string "(^[] String/.ToUpper \"hello\")"))]            ;;; .toUpperCase
+    (is (= :instance-call (:op a)))
+    (is (:validated? a))
+    (is (= '[] (:param-tags a))))
+
+  (let [a (ana (r/read-string "(^[] Int64/.ToString 42)"))]                   ;;; Long/.toString          XXX
+    (is (= :instance-call (:op a)))
+    (is (:validated? a))
+    (is (= '[] (:param-tags a)))))
+
+(deftest param-tags-wildcard-test
+  (let [a (ana (r/read-string "(^[_ _] String/.Substring \"hello\" 1 3)"))]   ;;; .substring
+    (is (= :instance-call (:op a)))
+    (is (:validated? a))
+    (is (= '[_ _] (:param-tags a)))))
+
+#_(deftest param-tags-array-types-test                                                ;;; no good equivalent at this time
+  (let [a (ana (r/read-string "^[long/1 long] java.util.Arrays/binarySearch"))]
+    (is (= :method-value (:op a)))
+    (is (= 1 (count (:methods a))))
+    (is (:validated? a)))
+
+  (let [a (ana (r/read-string "^[Object/1 _] java.util.Arrays/binarySearch"))]
+    (is (= :method-value (:op a)))
+    (is (= 1 (count (:methods a))))
+    (is (:validated? a))))
+
+(deftest bad-param-tags-test
+  (is (thrown? ExceptionInfo (ana (r/read-string "^[String String] Math/Abs"))))          ;; abs          
+  (is (thrown? ExceptionInfo (ana (r/read-string "(^[] String/foo \"a\")"))))
+  (is (thrown? ExceptionInfo (ana (r/read-string "(^[] String/.foo \"a\")"))))
+  (is (thrown? ExceptionInfo (ana (r/read-string "(^[String String String] java.util.UUID/new 1 2 3)")))))	
