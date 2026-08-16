@@ -25,7 +25,8 @@
                          PersistentVector PersistentArrayMap PersistentHashSet ISeq)
            System.Text.RegularExpressions.Regex
 		   (System.IO FileInfo)
-		   #_(java.util UUID Arrays)))                                                         ;;;
+		   #_(java.util UUID Arrays)
+		   ))                                                                             ;;; clojure.tools.analyzer.jvm.test.FieldMethodOverload
 
 (defn validate [ast]
   (env/with-env (ana.clr/global-env)
@@ -199,12 +200,14 @@
   (let [a (ana (r/read-string "^[long] Math/Abs"))]                ;;; String/valueOf
     (is (= :method-value (:op a)))
     (is (:validated? a))
-    (is (= 1 (count (:methods a)))))
+    (is (= 1 (count (:methods a))))
+    (is (= '[System.Int64] (-> a :methods first :parameter-types))))       ;;; '[long]   Java primitive value
 
   (let [a (ana (r/read-string "^[int int] String/.Substring"))]    ;;; .substring
     (is (= :method-value (:op a)))
     (is (:validated? a))
-    (is (= 1 (count (:methods a))))))
+    (is (= 1 (count (:methods a))))
+    (is (= '[System.Int32 System.Int32] (-> a :methods first :parameter-types)))))        ;;; '[int int]
 
 (deftest method-value-kinds-test
   (let [a (ast1 FileInfo/.get_Exists)]                                 ;;; File/.isDirectory
@@ -305,23 +308,27 @@
   (let [a (ana (r/read-string "^[double] Math/Abs"))]               ;;; abs
     (is (= :method-value (:op a)))
     (is (= 1 (count (:methods a))))
+    (is (= '[System.Double] (-> a :methods first :parameter-types)))       ;;; '[double]  Java primitive type
     (is (:validated? a)))
 
   (let [a (ana (r/read-string "^[float] Math/Abs"))]               ;;; abs
     (is (= :method-value (:op a)))
     (is (= 1 (count (:methods a))))
+    (is (= '[System.Single] (-> a :methods first :parameter-types)))         ;;; '[float]  Java primitive type
     (is (:validated? a)))
 
   (let [a (ana (r/read-string "^[long] Math/Abs"))]               ;;; abs
     (is (= :method-value (:op a)))
     (is (= 1 (count (:methods a))))
+    (is (= '[System.Int64] (-> a :methods first :parameter-types)))       ;;;; '[long]  Java primitive type
     (is (:validated? a)))
 
   (let [a (ana (r/read-string "^[int] Math/Abs"))]               ;;; abs
     (is (= :method-value (:op a)))
     (is (= 1 (count (:methods a))))
+    (is (= '[System.Int32] (-> a :methods first :parameter-types)))      ;;;  '[int]   Java primitive type
     (is (:validated? a))))
-
+	
 (deftest param-tags-constructor-invocation-test
   (let [a (ana (r/read-string "(^[String] System.Guid/new \"1\")"))]              ;;; "(^[long long] java.util.UUID/new 1 2)"
     (is (= :new (:op a)))
@@ -354,15 +361,34 @@
   (let [a (ana (r/read-string "^[long/1 long] java.util.Arrays/binarySearch"))]
     (is (= :method-value (:op a)))
     (is (= 1 (count (:methods a))))
+    (is (= '[long<> long] (-> a :methods first :parameter-types)))
     (is (:validated? a)))
 
   (let [a (ana (r/read-string "^[Object/1 _] java.util.Arrays/binarySearch"))]
     (is (= :method-value (:op a)))
     (is (= 1 (count (:methods a))))
+    (is (= '[java.lang.Object<> java.lang.Object] (-> a :methods first :parameter-types)))
     (is (:validated? a))))
-
+	
 (deftest bad-param-tags-test
   (is (thrown? ExceptionInfo (ana (r/read-string "^[String String] Math/Abs"))))          ;; abs          
   (is (thrown? ExceptionInfo (ana (r/read-string "(^[] String/foo \"a\")"))))
   (is (thrown? ExceptionInfo (ana (r/read-string "(^[] String/.foo \"a\")"))))
   (is (thrown? ExceptionInfo (ana (r/read-string "(^[String String String] java.util.UUID/new 1 2 3)")))))	
+  
+#_(deftest field-method-overload-test                                                                         ;;; We cannot define a field and a method with the same name, so this test does not apply
+  (let [a (ast1 clojure.tools.analyzer.jvm.test.FieldMethodOverload/doppelganger)]
+    (is (= :static-field (:op a))))
+
+  (let [a (ana (r/read-string "^[] clojure.tools.analyzer.jvm.test.FieldMethodOverload/doppelganger"))]
+    (is (= :method-value (:op a)))
+    (is (= 1 (count (:methods a))))
+    (is (= '[] (-> a :methods first :parameter-types))))
+
+  (let [a (ast1 (clojure.tools.analyzer.jvm.test.FieldMethodOverload/doppelganger))]
+    (is (= :static-call (:op a)))
+    (is (:validated? a)))
+
+  (let [a (ast1 (clojure.tools.analyzer.jvm.test.FieldMethodOverload/doppelganger (int 1) (int 2)))]
+    (is (= :static-call (:op a)))
+    (is (:validated? a)))) 
