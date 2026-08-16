@@ -54,7 +54,7 @@
                                (source-info env))))))))
 
 (defn- resolve-method-by-param-tags [methods param-tags ^Type class desc env]                ;;; ^Class
-  (or (resolve-hinted-method class methods param-tags)                                             ;;; Added extra parameter to resolve-hinted-method to deal with some overloading situations
+  (or (resolve-hinted-method methods param-tags)
       (throw (ex-info (str "param-tags " (pr-str param-tags)
                            " insufficient to resolve " desc
                            " in class " (.FullName class))                                   ;;; .getName
