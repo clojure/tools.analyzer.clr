@@ -17,29 +17,29 @@ Fully functional except:
 
 # Releases
 
-Latest stable release: 1.3.2
+Latest stable release: 1.4.0
 
 [CLI/`deps.edn`](https://clojure.org/reference/deps_edn) dependency information:
 ```clojure
-io.github.clojure/tools.analyzer.clr {:git/tag "v1.3.2" :git/sha "732a0f4"}
+io.github.clojure/tools.analyzer.clr {:git/tag "v1.4.0" :git/sha "7a01a3b"}
 ```
 
 Nuget reference:
 
 ```
-    PM> Install-Package clojure.tools.analyzer.clr -Version 1.3.2 
+    PM> Install-Package clojure.tools.analyzer.clr -Version 1.4.0 
 ```
 	
 Leiningen/Clojars reference:
 
 ```
-   [org.clojure.clr/tools.analyzer.clr "1.3.2"]
+   [org.clojure.clr/tools.analyzer.clr "1.4.0"]
 ```
    
 
 ## License
 
-Copyright (C) 2022 Rich Hickey, David Miller & ClojureCLR contributors
+Copyright (C) 2026 Rich Hickey & ClojureCLR contributors
 Distributed under the Eclipse Public License, the same as Clojure.
 
 
