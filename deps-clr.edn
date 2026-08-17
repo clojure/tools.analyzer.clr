@@ -3,7 +3,7 @@
  {
    io.github.clojure/clr.tools.reader {:git/tag "v1.5.2" :git/sha "1a7a8e9"}
    io.github.clojure/clr.core.memoize {:git/tag "v1.1.266" :git/sha "a1a7f68"}
-   io.github.clojure/tools.analyzer {:git/sha "bb895828a64327b8c5d1370e396271c8e519dfae"}
+   io.github.clojure/tools.analyzer { :git/tag "v1.2.2" :git/sha "bb89582"}
  }
 
  :aliases
