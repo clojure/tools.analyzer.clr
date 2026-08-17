@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :source-paths ["src/main/clojure" "src/main/lib"]
   :test-paths ["src/test/clojure"]			
-  :dependencies [[org.clojure/tools.analyzer "1.1.1"]
+  :dependencies [[org.clojure/tools.analyzer "1.2.2"]
                  [org.clojure.clr/core.memoize "1.1.266"]
 				 [org.clojure.clr/tools.reader "1.5.2"]]
   :deploy-repositories [["clojars" {:url "https://clojars.org/repo/"
